@@ -118,3 +118,36 @@ function Invoke-CMMachinePolicyUpdate {
       Pop-Location
   }
 }
+
+function Invoke-CMCollectionUpdateForInstantImaging {
+    [CmdletBinding()]
+    param()
+
+    BEGIN{    
+        Write-Host "Starting at $(Get-Date -DisplayHint Time)"
+        if($pwd.Path -ne "MP0:\"){
+            Push-Location
+            Prep-MECM
+        }
+    }
+
+    PROCESS {
+        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS OSD TS + No Maintenance Window"
+        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, with SC)"
+        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Exclude from ALL windows"
+        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Exclude from Standard window"
+        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Machines not in ANY maint window collection (Alternate)"
+        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Standard window"
+        Write-Host "$(Get-Date -DisplayHint Time) Collection updates initiated! Try Invoke-TaskSequence in like 15 minutes."
+        Write-Host "$(Get-Date -DisplayHint Time) Waiting 15 minutes to push policy..."
+
+        Write-Host "$(Get-Date -DisplayHint Time) Pushing Policy Update..."
+        Invoke-CMMachinePolicyUpdate -CollectionName "UIUC-ENGR-IS OSD TS + No Maintenance Window" -Delay 900
+        $DeploymentID = (Get-CMDeployment -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, with SC)").DeploymentID
+        Write-Host "Reminder: When you're ready, invoke task sequence with deployment id $DeploymentID"
+    }
+
+    END {
+        Pop-Location
+    }
+}
