@@ -20,103 +20,103 @@ function hist {
 
 function Invoke-CMCollectionUpdateForImaging {
 
-  [CmdletBinding()]
+    [CmdletBinding()]
 
-  param(
-      [Parameter(Mandatory)]
-      [String] $ComputerName,
-      [Int] $CheckingIntervalInSeconds = 120,
-      [Int] $CheckLimitCount = 20,
-      [Switch] $PassThru
-  )
+    param(
+        [Parameter(Mandatory)]
+        [String] $ComputerName,
+        [Int] $CheckingIntervalInSeconds = 120,
+        [Int] $CheckLimitCount = 20,
+        [Switch] $PassThru
+    )
 
-  BEGIN{    
-      Write-Host "Starting at $(Get-Date -DisplayHint Time)"
-      if($pwd.Path -ne "MP0:\"){
-          Push-Location
-          Prep-MECM
-      }
-  }
+    BEGIN{    
+        Write-Host "Starting at $(Get-Date -DisplayHint Time)"
+        if($pwd.Path -ne "MP0:\"){
+            Push-Location
+            Prep-MECM
+        }
+    }
 
-  PROCESS{
+    PROCESS{
 
-      $ComputerExists = $false
-      $CheckCount = 0
-      while ((-not $ComputerExists) -and ($CheckCount -le $CheckLimitCount)){
-          $DeviceCheck = Get-CMDevice -Name $ComputerName -Resource
-          if($DeviceCheck){
-              $ComputerExists = $true
-              Write-Host "Device discovered at $(Get-Date -DisplayHint Time)"
-          }else{
-              Write-Host "Device not found! Trying again in $CheckingIntervalInSeconds Seconds. $($CheckLimitCount - $CheckCount) attempts remaining."
-              Start-Sleep -Seconds $CheckingIntervalInSeconds
-              $CheckCount++
-          }
-          
-      }
+        $ComputerExists = $false
+        $CheckCount = 0
+        while ((-not $ComputerExists) -and ($CheckCount -le $CheckLimitCount)){
+            $DeviceCheck = Get-CMDevice -Name $ComputerName -Resource
+            if($DeviceCheck){
+                $ComputerExists = $true
+                Write-Host "Device discovered at $(Get-Date -DisplayHint Time)"
+            }else{
+                Write-Host "Device not found! Trying again in $CheckingIntervalInSeconds Seconds. $($CheckLimitCount - $CheckCount) attempts remaining."
+                Start-Sleep -Seconds $CheckingIntervalInSeconds
+                $CheckCount++
+            }
+            
+        }
 
-      $CollectionCheck = Get-CMCollectionMember -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)" -Name $ComputerName
+        $CollectionCheck = Get-CMCollectionMember -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)" -Name $ComputerName
 
-      if(-not $CollectionCheck){
-          Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Devices without MECM client"
-          Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional plus devices without MECM client"
-          Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)"
-          
-          $ComputerExistsInCollection = $false
-          $CheckCount = 0
+        if(-not $CollectionCheck){
+            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Devices without MECM client"
+            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional plus devices without MECM client"
+            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)"
+            
+            $ComputerExistsInCollection = $false
+            $CheckCount = 0
 
-          while((-not $ComputerExistsInCollection) -and ($CheckCount -le $CheckLimitCount)){
-              $CollectionCheck = Get-CMCollectionMember -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)" -Name $ComputerName
-              if($CollectionCheck){
-                  $ComputerExistsInCollection = $true
-                  Write-Host "Device in collection at $(Get-Date -DisplayHint Time)"
-                  if($PassThru){
-                      Write-Output $CollectionCheck
-                  }
-              }else{
-                  Write-Host "Device not found in the imaging collection! Trying again in $CheckingIntervalInSeconds Seconds. $($CheckLimitCount - $CheckCount) attempts remaining."
-                  $CheckCount++
-                  Start-Sleep -Seconds $CheckingIntervalInSeconds
-              }
-          }
-      }
-  }
+            while((-not $ComputerExistsInCollection) -and ($CheckCount -le $CheckLimitCount)){
+                $CollectionCheck = Get-CMCollectionMember -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)" -Name $ComputerName
+                if($CollectionCheck){
+                    $ComputerExistsInCollection = $true
+                    Write-Host "Device in collection at $(Get-Date -DisplayHint Time)"
+                    if($PassThru){
+                        Write-Output $CollectionCheck
+                    }
+                }else{
+                    Write-Host "Device not found in the imaging collection! Trying again in $CheckingIntervalInSeconds Seconds. $($CheckLimitCount - $CheckCount) attempts remaining."
+                    $CheckCount++
+                    Start-Sleep -Seconds $CheckingIntervalInSeconds
+                }
+            }
+        }
+    }
 
-  END{
-      Pop-Location
-  }
+    END{
+        Pop-Location
+    }
 }
 
 function Invoke-CMMachinePolicyUpdate {
 
-  [CmdletBinding()]
+    [CmdletBinding()]
 
-  param(
-      [Parameter(Mandatory)]
-      [String] $CollectionName,
-      [Int] $Delay = 120,
-      [Switch] $PassThru
-  )
+    param(
+        [Parameter(Mandatory)]
+        [String] $CollectionName,
+        [Int] $Delay = 120,
+        [Switch] $PassThru
+    )
 
-  BEGIN{    
-      Write-Host "Starting at $(Get-Date -DisplayHint Time)"
-      if($pwd.Path -ne "MP0:\"){
-          Push-Location
-          Prep-MECM
-      }
-  }
+    BEGIN{    
+        Write-Host "Starting at $(Get-Date -DisplayHint Time)"
+        if($pwd.Path -ne "MP0:\"){
+            Push-Location
+            Prep-MECM
+        }
+    }
 
-  PROCESS{
-      Write-Host "Waiting $Delay Seconds..."
-      Start-Sleep -Seconds $Delay
+    PROCESS{
+        Write-Host "Waiting $Delay Seconds..."
+        Start-Sleep -Seconds $Delay
 
-      Invoke-CMClientAction -CollectionName $CollectionName -ActionType ClientNotificationRequestMachinePolicyNow
-  }
+        Write-Host "$(Get-Date -DisplayHint Time) Pushing Policy Update..."
+        Invoke-CMClientAction -CollectionName $CollectionName -ActionType ClientNotificationRequestMachinePolicyNow
+    }
 
-  END{
-      Write-Host "Done!"
-      Pop-Location
-  }
+    END{
+        Write-Host "Done at $(Get-Date -DisplayHint Time)"
+    }
 }
 
 function Invoke-CMCollectionUpdateForInstantImaging {
@@ -141,7 +141,6 @@ function Invoke-CMCollectionUpdateForInstantImaging {
         Write-Host "$(Get-Date -DisplayHint Time) Collection updates initiated! Try Invoke-TaskSequence in like 15 minutes."
         Write-Host "$(Get-Date -DisplayHint Time) Waiting 15 minutes to push policy..."
 
-        Write-Host "$(Get-Date -DisplayHint Time) Pushing Policy Update..."
         Invoke-CMMachinePolicyUpdate -CollectionName "UIUC-ENGR-IS OSD TS + No Maintenance Window" -Delay 900
         $DeploymentID = (Get-CMDeployment -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, with SC)").DeploymentID
         Write-Host "Reminder: When you're ready, invoke task sequence with deployment id $DeploymentID"
