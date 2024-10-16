@@ -5,7 +5,7 @@ function Invoke-CMMachinePolicyUpdate {
     param(
         [Parameter(Mandatory)]
         [String] $CollectionName,
-        [Int] $Delay = 120,
+        [Int] $Delay,
         [Switch] $PassThru
     )
 
@@ -18,8 +18,10 @@ function Invoke-CMMachinePolicyUpdate {
     }
 
     PROCESS{
-        Write-Host "Waiting $Delay Seconds..."
-        Start-Sleep -Seconds $Delay
+        if($Delay -gt 0){
+            Write-Host "Waiting $Delay Seconds..."
+            Start-Sleep -Seconds $Delay
+        }
 
         Write-Host "$(Get-Date -DisplayHint Time) Pushing Policy Update..."
         Invoke-CMClientAction -CollectionName $CollectionName -ActionType ClientNotificationRequestMachinePolicyNow
