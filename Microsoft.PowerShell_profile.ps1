@@ -1,6 +1,6 @@
 foreach ($function in (Get-ChildItem "$($env:USERPROFILE)\Documents\PowerShell\Functions" -Recurse -File -Filter "*.ps1"))
 {
-    Write-Host "Importing $function"
+    Write-Host "Importing $function"
     . $function.FullName
 }
 
