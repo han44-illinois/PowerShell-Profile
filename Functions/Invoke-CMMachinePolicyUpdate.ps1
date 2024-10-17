@@ -25,6 +25,7 @@ function Invoke-CMMachinePolicyUpdate {
 
         Write-Host "$(Get-Date -DisplayHint Time) Pushing Policy Update..."
         Invoke-CMClientAction -CollectionName $CollectionName -ActionType ClientNotificationRequestMachinePolicyNow
+        Invoke-CMClientAction -CollectionName $CollectionName -ActionType ClientNotificationAppDeplEvalNow
     }
 
     END{
