@@ -39,12 +39,18 @@ function Get-CMApplicationInfoForDocumentation{
         $SDMPackageXML = [xml]$Application.SDMPackageXML
 
         $InstallerXML = [xml]$SDMPackageXML.AppMgmtDigest.DeploymentType.Installer.InstallAction.Args.OuterXml
-        $InstallDirectory = $InstallerXML.Args.Arg[1].'#text'
+        $InstallDirectory = ($InstallerXML.Args.Arg[1].'#text' + "\") -replace "\\","\"
+        if($InstallDirectory.StartsWith('\')){
+            $InstallDirectory = $InstallDirectory.TrimStart('\')
+        }
         $InstallCommand = $InstallerXML.Args.Arg[0].'#text'
         $Install = '`' + $InstallDirectory + $InstallCommand + '`'
 
         $UninstallerXML = [xml]$SDMPackageXML.AppMgmtDigest.DeploymentType.Installer.UninstallAction.Args.OuterXml
-        $UninstallDirectory = $UninstallerXML.Args.Arg[1].'#text'
+        $UninstallDirectory = ($UninstallerXML.Args.Arg[1].'#text' + "\") -replace "\\","\"
+        if($UninstallDirectory.StartsWith('\')){
+            $UninstallDirectory = $UninstallDirectory.TrimStart('\')
+        }
         $UninstallCommand = $UninstallerXML.Args.Arg[0].'#text'
         $Uninstall = '`' + $UninstallDirectory + $UninstallCommand + '`'
 
