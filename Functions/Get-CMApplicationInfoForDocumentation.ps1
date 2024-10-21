@@ -58,22 +58,31 @@ function Get-CMApplicationInfoForDocumentation{
         
         # switch for detection method type to catch non-registry detection methods later
         $DetectionType = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operands.SettingReference.SettingSourceType
+        $DetectionMethod = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operands.SettingReference.Method
         switch ($DetectionType) {
             "Registry" {
                 $Hive = $DetectionXML.EnhancedDetectionMethod.Settings.SimpleSetting.RegistryDiscoverySource.Hive
                 $Key = $DetectionXML.EnhancedDetectionMethod.Settings.SimpleSetting.RegistryDiscoverySource.Key
                 $Value = $DetectionXML.EnhancedDetectionMethod.Settings.SimpleSetting.RegistryDiscoverySource.ValueName
 
-                $Operator = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operator
-                switch ($Operator) {
-                    # Add more cases here
-                    "GreaterEquals" {$OperatorChar = '>='}
-                    "Equals"        {$OperatorChar = '='}
-                }
-
+                
                 $DetectionVersion = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operands.ConstantValue.Value
 
-                $DetectionMethod = '`Registry: ' + $Hive + ":\" + $Key + "\" + $Value + " " + $OperatorChar + " " + $DetectionVersion + '`'
+                if(($DetectionMethod -eq "Count") -and ($DetectionVersion -eq 0)){
+                    $DetectionVersion = "exists"
+                } else {
+
+                    $Operator = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operator
+                    switch ($Operator) {
+                        # Add more cases here
+                        "GreaterEquals" {$OperatorChar = '>='}
+                        "Equals"        {$OperatorChar = '='}
+                        "NotEquals"     {$OperatorChar = '!='}
+                    }
+                }
+                
+
+                $DetectionMethod = ('`Registry: ' + $Hive + ":\" + $Key + "\" + $Value + " " + $OperatorChar + " " + $DetectionVersion + '`') -replace "  "," "
             }
             "File" {
                 $Path = ($DetectionXML.EnhancedDetectionMethod.Settings.File.Path + "\") -replace "\\","\"
@@ -82,15 +91,22 @@ function Get-CMApplicationInfoForDocumentation{
                 }
                 $FileOrFolderName = $DetectionXML.EnhancedDetectionMethod.Settings.File.Filter
 
-                $Operator = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operator
-                switch ($Operator) {
-                    # Add more cases here
-                    "GreaterEquals" {$OperatorChar = '>='}
-                    "Equals"        {$OperatorChar = '='}
+                $DetectionVersion = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operands.ConstantValue.Value
+
+                if(($DetectionMethod -eq "Count") -and ($DetectionVersion -eq 0)){
+                    $DetectionVersion = "exists"
+                } else {
+
+                    $Operator = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operator
+                    switch ($Operator) {
+                        # Add more cases here
+                        "GreaterEquals" {$OperatorChar = '>='}
+                        "Equals"        {$OperatorChar = '='}
+                        "NotEquals"     {$OperatorChar = '!='}
+                    }
                 }
                 
-                $DetectionVersion = $DetectionXML.EnhancedDetectionMethod.Rule.Expression.Operands.ConstantValue.Value
-                $DetectionMethod = '`File: ' + $Path + $FileOrFolderName + " " + $OperatorChar + " " + $DetectionVersion + '`'
+                $DetectionMethod = ('`File: ' + $Path + $FileOrFolderName + " " + $OperatorChar + " " + $DetectionVersion + '`') -replace "  "," "
             }
         }
 
