@@ -25,7 +25,15 @@ function Get-CMApplicationInfoForDocumentation{
     [CmdletBinding()]
 
     param(
-        [Parameter()]
+        [ArgumentCompleter( {
+			param ( $commandName,
+                    $parameterName,
+                    $wordToComplete,
+                    $commandAst,
+                    $fakeBoundParameters )
+			$possibleValues = (Get-CMApplication -Fast).LocalizedDisplayName | Sort-Object | Where-Object {$_ -like "*$wordToComplete*"} | ForEach-Object {"`"$_`""}
+			$possibleValues
+		})]
         [String] $Name
     )
 
@@ -45,6 +53,7 @@ function Get-CMApplicationInfoForDocumentation{
         }
         $InstallCommand = $InstallerXML.Args.Arg[0].'#text'
         $Install = '`' + $InstallDirectory + $InstallCommand + '`'
+        $Install = $Install -replace '\\','\'
 
         $UninstallerXML = [xml]$SDMPackageXML.AppMgmtDigest.DeploymentType.Installer.UninstallAction.Args.OuterXml
         $UninstallDirectory = ($UninstallerXML.Args.Arg[1].'#text' + "\") -replace "\\","\"
@@ -53,6 +62,7 @@ function Get-CMApplicationInfoForDocumentation{
         }
         $UninstallCommand = $UninstallerXML.Args.Arg[0].'#text'
         $Uninstall = '`' + $UninstallDirectory + $UninstallCommand + '`'
+        $Uninstall = $Uninstall -replace '\\','\'
 
         $DetectionXML = [xml]$SDMPackageXML.AppMgmtDigest.DeploymentType.Installer.DetectAction.Args.Arg[1].'#text'
         
@@ -82,7 +92,7 @@ function Get-CMApplicationInfoForDocumentation{
                 }
                 
 
-                $DetectionMethod = ('`Registry: ' + $Hive + ":\" + $Key + "\" + $Value + " " + $OperatorChar + " " + $DetectionVersion + '`') -replace "  "," "
+                $DetectionMethod = ('Registry: `' + $Hive + ":\" + $Key + "\" + $Value + " " + $OperatorChar + " " + $DetectionVersion + '`') -replace "  "," "
             }
             "File" {
                 $Path = ($DetectionXML.EnhancedDetectionMethod.Settings.File.Path + "\") -replace "\\","\"
@@ -107,6 +117,7 @@ function Get-CMApplicationInfoForDocumentation{
                 }
                 
                 $DetectionMethod = ('`File: ' + $Path + $FileOrFolderName + " " + $OperatorChar + " " + $DetectionVersion + '`') -replace "  "," "
+                $DetectionMethod = $DetectionMethod -replace '\\','\'
             }
         }
 
