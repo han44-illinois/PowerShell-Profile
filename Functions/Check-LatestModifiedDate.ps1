@@ -36,7 +36,7 @@ function Check-LatestModifiedDate {
     $Output
 }
 
-$ClassDirs = Get-ChildItem -Path "\\ad.uillinois.edu\engr-ews\classes" -Directory
-$Output = $ClassDirs | ForEach-Object {
-    Check-LatestModifiedDate -Path $_.FullName
-}
+#$ClassDirs = Get-ChildItem -Path "\\ad.uillinois.edu\engr-ews\classes" -Directory
+#$Output = $ClassDirs | ForEach-Object {
+#    Check-LatestModifiedDate -Path $_.FullName
+#}
