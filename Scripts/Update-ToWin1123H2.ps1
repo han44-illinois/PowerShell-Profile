@@ -9,6 +9,7 @@ function Import-PSWindowsUpdate {
 function Update-ToWin1123H2{
 
     BEGIN{
+        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
         Import-PSWindowsUpdate
     }
 
@@ -22,3 +23,4 @@ function Update-ToWin1123H2{
 
     END{}
 }
+Update-ToWin1123H2
