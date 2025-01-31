@@ -35,18 +35,18 @@ function Invoke-CMCollectionUpdateForImaging {
             
         }
 
-        $CollectionCheck = Get-CMCollectionMember -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)" -Name $ComputerName
+        $CollectionCheck = Get-CMCollectionMember -CollectionName "UIUC-ENGR-IS Deploy OSD TS (Win11 2023c, Available, no SC)" -Name $ComputerName
 
         if(-not $CollectionCheck){
             Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Devices without MECM client"
             Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional plus devices without MECM client"
-            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)"
+            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Deploy OSD TS (Win11 2023c, Available, no SC)"
             
             $ComputerExistsInCollection = $false
             $CheckCount = 0
 
             while((-not $ComputerExistsInCollection) -and ($CheckCount -le $CheckLimitCount)){
-                $CollectionCheck = Get-CMCollectionMember -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, no SC)" -Name $ComputerName
+                $CollectionCheck = Get-CMCollectionMember -CollectionName "UIUC-ENGR-IS Deploy OSD TS (Win11 2023c, Available, no SC)" -Name $ComputerName
                 if($CollectionCheck){
                     $ComputerExistsInCollection = $true
                     Write-Host "Device in collection at $(Get-Date -DisplayHint Time)"
