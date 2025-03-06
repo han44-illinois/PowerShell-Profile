@@ -9,13 +9,14 @@ function Import-PSWindowsUpdate {
 function Update-ToWin1123H2{
 
     BEGIN{
-        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+        #Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
         Import-PSWindowsUpdate
     }
 
     PROCESS{
         if((Get-CimInstance -ClassName Win32_OperatingSystem).BuildNumber -lt 22631){
-            Install-WindowsUpdate -KBArticleID KB5037771 -AcceptAll -AutoReboot
+            Get-WindowsUpdate | Out-Null
+            Install-WindowsUpdate -KBArticleID KB5039212 -AcceptAll -AutoReboot
         }else{
             Write-Host "$env:COMPUTERNAME is already on Win11 23H2 or newer"
         }
