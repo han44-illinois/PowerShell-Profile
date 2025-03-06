@@ -58,5 +58,7 @@ function Get-VLANForIP{
         }
     }
 
-    END{}
+    END{
+        Write-Host "Check for building code: https://fs.illinois.edu/building-list-by-building-number/"
+    }
 }
