@@ -15,8 +15,9 @@ function Update-ToWin1123H2{
 
     PROCESS{
         if((Get-CimInstance -ClassName Win32_OperatingSystem).BuildNumber -lt 22631){
-            Get-WindowsUpdate | Out-Null
-            Install-WindowsUpdate -KBArticleID KB5039212 -AcceptAll -AutoReboot
+            $Updates = Get-WindowsUpdate
+            $KBArticle = ($Updates | where-object {$_.Title -like "*Windows 11, version 23H2*"}).KB
+            Install-WindowsUpdate -KBArticleID $KBArticle -AcceptAll -AutoReboot
         }else{
             Write-Host "$env:COMPUTERNAME is already on Win11 23H2 or newer"
         }
