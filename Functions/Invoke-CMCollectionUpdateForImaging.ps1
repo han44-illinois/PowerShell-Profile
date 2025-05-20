@@ -39,6 +39,7 @@ function Invoke-CMCollectionUpdateForImaging {
 
         if(-not $CollectionCheck){
             Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Devices without MECM client"
+            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional"
             Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional plus devices without MECM client"
             Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Deploy OSD TS (Win11 2023c, Available, no SC)"
             Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, no SC)"
