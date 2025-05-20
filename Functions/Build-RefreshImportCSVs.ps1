@@ -39,12 +39,16 @@ function Build-RefreshImportCSVs{
             $MECMcsv = New-Object -TypeName System.Collections.ArrayList
             $IPAMcsv = New-Object -TypeName System.Collections.ArrayList
             $SatelliteTXT = New-Object -TypeName System.Collections.ArrayList
+
+            $SatelliteTXT.Add('#!/bin/bash') | Out-Null
     
             $Refresh | ForEach-Object {
                 if($_.Lab -eq $CurrentLab){
                     $ComputerName = $_.'Intended Hostname'
                     $MACAddress = $_.'LOM MAC (10GB NIC)' -split '(..)' -ne '' -join ":"
                     $OS = $_.'Intended OS/Image'
+
+                    $Hostname = ($ComputerName + ".ews.illinois.edu") -replace ".ews.illinois.edu.ews.illinois.edu",".ews.illinois.edu"
 
                     if($OS -eq "Windows"){
                         $MECMResult = [PSCustomObject]@{
@@ -54,37 +58,43 @@ function Build-RefreshImportCSVs{
                         $MECMcsv.Add($MECMResult) | Out-Null
                     }
 
-                    if($OS -eq "Linux"){
+                    if($OS -eq "RHEL"){
                         $SatelliteResult = "hammer host create --name $ComputerName --interface mac=$MACAddress --hostgroup=rhel-9-serv-x86_64 --pxe-loader 'Grub2 UEFI' --parameters part_device=/dev/nvme0n1 --organization='GCoE' --location='Instructional' --subnet=default"
+                        $SatelliteTXT.Add($SatelliteResult) | Out-Null
+                    }
+
+                    if($OS -eq "Ubuntu"){
+                        $SatelliteResult = "hammer host create --name $ComputerName --interface mac=$MACAddress --hostgroup=ubuntu-24-eli-x86_64 --pxe-loader 'Grub2 UEFI' --parameters part_device=/dev/nvme0n1 --organization='GCoE' --location='Instructional' --subnet=default"
                         $SatelliteTXT.Add($SatelliteResult) | Out-Null
                     }
     
                     try{
-                        $IPAddress = ([System.Net.Dns]::GetHostAddresses($ComputerName + ".ews.illinois.edu")).IPAddressToString
+                        $IPAddress = ([System.Net.Dns]::GetHostAddresses($Hostname)).IPAddressToString
                         if($IPAddress.Count -ge 2){
-                            $IPsToCheck.Add($ComputerName + ".ews.illinois.edu") | Out-Null
+                            $IPsToCheck.Add($Hostname) | Out-Null
                             $IPAddress = $IPAddress[0]
                         }
                     } catch {
                         $IPAddress = ""
                         $LabsToCheck.Add($CurrentLab) | Out-Null
                     }
+                    
                     if($OS -eq "Windows"){
                         $IPAMResult = [PSCustomObject]@{
                             "header-hostaddress"    = "hostaddress"
                             "address*"              = $IPAddress
-                            "parent*"               = $ComputerName + ".ews.illinois.edu"
+                            "parent*"               = $Hostname
                             "boot_file"             = ""
                             "configure_for_dhcp"    = "TRUE"
                             "mac_address"           = $MACAddress
                             "next_server"           = ""
                         }
                     }
-                    if($OS -eq "Linux"){
+                    if(($OS -eq "RHEL") -or ($OS -eq "Ubuntu")){
                         $IPAMResult = [PSCustomObject]@{
                             "header-hostaddress"    = "hostaddress"
                             "address*"              = $IPAddress
-                            "parent*"               = $ComputerName + ".ews.illinois.edu"
+                            "parent*"               = $Hostname
                             "boot_file"             = "grub2/grubx64.efi"
                             "configure_for_dhcp"    = "TRUE"
                             "mac_address"           = $MACAddress
@@ -94,8 +104,8 @@ function Build-RefreshImportCSVs{
                     $IPAMcsv.Add($IPAMResult) | Out-Null
                 }
             }
-            if($OS -eq "Windows")   {$MECMcsv | ConvertTo-Csv -NoHeader  | Out-File "$OutputPath\MECM\$CurrentLab-MECM.csv"}
-            if($OS -eq "Linux")     {$SatelliteTXT | Out-File "$OutputPath\Satellite\$CurrentLab-Satellite.txt"}
+            if($OS -eq "Windows")                           {$MECMcsv | ConvertTo-Csv -NoHeader  | Out-File "$OutputPath\MECM\$CurrentLab-MECM.csv"}
+            if(($OS -eq "RHEL") -or ($OS -eq "Ubuntu"))     {$SatelliteTXT | Out-File "$OutputPath\Satellite\$CurrentLab-Satellite.txt"}
             $IPAMcsv | ConvertTo-Csv            | Out-File "$OutputPath\IPAM\$CurrentLab-IPAM.csv"
             Write-Host "Processed $CurrentLab"
         }
