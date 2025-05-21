@@ -8,6 +8,15 @@ function Build-RefreshImportCSVs{
         [string]
         $OutputPath
     )
+
+        # Columns from the CSV because this seems to change every year.
+        $ColumnLab = "Actual Lab"
+        $ColumnName = "Actual Hostname"
+        $ColumnMac = 'LOM MAC (10GB NIC)'
+        $ColumnOS = 'Actual OS/Image'
+
+        # Spare Lab. This value should be whatever marks our spares, since we don't care to create import sheets for those.
+        $SpareLab = "EWS-FY25"
     
         if([IO.Path]::GetExtension($InputFile) -ne ".csv"){
             throw "This function requires a .csv input!"
@@ -29,8 +38,8 @@ function Build-RefreshImportCSVs{
             New-Item -Path "$OutputPath\IPAM" -ItemType Directory
         }
     
-        $Refresh = Get-Content $InputFile | ConvertFrom-Csv | Where-Object {$_.Lab -notlike "#VALUE!"}
-        $Labs = $Refresh.Lab | Sort-Object -Unique
+        $Refresh = Get-Content $InputFile | ConvertFrom-Csv | Where-Object {$_.$ColumnLab -notlike $SpareLab}
+        $Labs = $Refresh.$ColumnLab | Sort-Object -Unique
         $LabsToCheck = New-Object -TypeName System.Collections.ArrayList
         $IPsToCheck = New-Object -TypeName System.Collections.ArrayList
     
@@ -44,9 +53,9 @@ function Build-RefreshImportCSVs{
     
             $Refresh | ForEach-Object {
                 if($_.Lab -eq $CurrentLab){
-                    $ComputerName = $_.'Intended Hostname'
-                    $MACAddress = $_.'LOM MAC (10GB NIC)' -split '(..)' -ne '' -join ":"
-                    $OS = $_.'Intended OS/Image'
+                    $ComputerName = $_.$ColumnName
+                    $MACAddress = $_.$ColumnMac -split '(..)' -ne '' -join ":"
+                    $OS = $_.$ColumnOS
 
                     $Hostname = ($ComputerName + ".ews.illinois.edu") -replace ".ews.illinois.edu.ews.illinois.edu",".ews.illinois.edu"
 
