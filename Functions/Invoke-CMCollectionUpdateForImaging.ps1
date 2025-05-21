@@ -7,7 +7,8 @@ function Invoke-CMCollectionUpdateForImaging {
         [String] $ComputerName,
         [Int] $CheckingIntervalInSeconds = 120,
         [Int] $CheckLimitCount = 20,
-        [Switch] $PassThru
+        [Switch] $PassThru,
+        [Switch] $Beep
     )
 
     BEGIN{    
@@ -65,6 +66,9 @@ function Invoke-CMCollectionUpdateForImaging {
     }
 
     END{
+        if($Beep){
+            [Console]::Beep(200,2000)
+        }
         Pop-Location
     }
 }
