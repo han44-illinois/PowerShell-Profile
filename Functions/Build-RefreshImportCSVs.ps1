@@ -16,7 +16,7 @@ function Build-RefreshImportCSVs{
         $ColumnOS = 'Actual OS/Image'
 
         # Spare Lab. This value should be whatever marks our spares, since we don't care to create import sheets for those.
-        $SpareLab = "EWS-FY25"
+        $SpareLab = "*EWS-FY25*"
     
         if([IO.Path]::GetExtension($InputFile) -ne ".csv"){
             throw "This function requires a .csv input!"
@@ -52,7 +52,7 @@ function Build-RefreshImportCSVs{
             $SatelliteTXT.Add('#!/bin/bash') | Out-Null
     
             $Refresh | ForEach-Object {
-                if($_.Lab -eq $CurrentLab){
+                if($_.$ColumnLab -eq $CurrentLab){
                     $ComputerName = $_.$ColumnName
                     $MACAddress = $_.$ColumnMac -split '(..)' -ne '' -join ":"
                     $OS = $_.$ColumnOS
@@ -113,9 +113,9 @@ function Build-RefreshImportCSVs{
                     $IPAMcsv.Add($IPAMResult) | Out-Null
                 }
             }
-            if($OS -eq "Windows")                           {$MECMcsv | ConvertTo-Csv -NoHeader  | Out-File "$OutputPath\MECM\$CurrentLab-MECM.csv"}
-            if(($OS -eq "RHEL") -or ($OS -eq "Ubuntu"))     {$SatelliteTXT | Out-File "$OutputPath\Satellite\$CurrentLab-Satellite.txt"}
-            $IPAMcsv | ConvertTo-Csv            | Out-File "$OutputPath\IPAM\$CurrentLab-IPAM.csv"
+            if($MECMcsv)            {$MECMcsv | ConvertTo-Csv -NoHeader  | Out-File "$OutputPath\MECM\$CurrentLab-MECM.csv"}
+            if($SatelliteTXT)       {$SatelliteTXT | Out-File "$OutputPath\Satellite\$CurrentLab-Satellite.txt"}
+            if($IPAMcsv)            {$IPAMcsv | ConvertTo-Csv            | Out-File "$OutputPath\IPAM\$CurrentLab-IPAM.csv"}
             Write-Host "Processed $CurrentLab"
         }
     
