@@ -17,7 +17,7 @@ function Invoke-CMCollectionUpdateForImaging {
             Push-Location
             Prep-MECM
         }
-        $ImagingCollection = "UIUC-ENGR-IS Deploy OSD TS (Win11 2025c, Available, no SC)"
+        $ImagingCollection = "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, no SC)"
     }
 
     PROCESS{
