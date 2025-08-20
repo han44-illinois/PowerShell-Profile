@@ -24,9 +24,10 @@ function Uninstall-MatlabR2024bFromLab {
         $MatlabBinary = "\\$_\c`$\Program Files\MATLAB\R2024b\bin\matlab.exe"
         if(Test-Connection $_ -Count 1 -Quiet){
             if((Test-Path $MatlabUninstaller) -and (Test-Path $MatlabBinary)){
-            Invoke-Command -ComputerName $_ -ScriptBlock {
-                Start-Process "C:\Program Files\MATLAB\R2024b\bin\win64\MathWorksProductUninstaller.exe" -ArgumentList "--mode silent" -Wait
-            }
+                Write-Host "Uninstalling from $_"
+                Invoke-Command -ComputerName $_ -ScriptBlock {
+                    Start-Process "C:\Program Files\MATLAB\R2024b\bin\win64\MathWorksProductUninstaller.exe" -ArgumentList "--mode silent" -Wait
+                }
             }
             if(Test-Path $MatlabBinary){
                 Write-Output "$_ Failed"
@@ -50,6 +51,7 @@ function Uninstall-MatlabR2024bFromLab {
     }
 
     $comps.name | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
+        Write-Host "Installing on $_"
         Invoke-MECMAppInstall -Computer $_ -AppName "Matlab" -Method Install
     } | Sort-Object -Property PSComputerName
 
