@@ -3,7 +3,8 @@ function Uninstall-MatlabR2024bFromLab {
     param (
         [Parameter(Mandatory)]
         [string]
-        $ComputerNameQuery
+        $ComputerNameQuery,
+        [int]$ThrottleLimit = 5
     )
 
     $comps = Get-ADComputer -Filter {Name -like $ComputerNameQuery} -SearchBase "OU=Instructional,OU=Desktops,OU=Engineering,OU=Urbana,DC=ad,DC=uillinois,DC=edu"
@@ -18,20 +19,25 @@ function Uninstall-MatlabR2024bFromLab {
         Default {throw "Huh?"}
     }
     
-    $comps.name | ForEach-Object -ThrottleLimit 5 -Parallel {
+    $comps.name | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
         $MatlabUninstaller = "\\$_\c`$\Program Files\MATLAB\R2024b\bin\win64\MathWorksProductUninstaller.exe"
         $MatlabBinary = "\\$_\c`$\Program Files\MATLAB\R2024b\bin\matlab.exe"
-        if((Test-Path $MatlabUninstaller) -and (Test-Path $MatlabBinary)){
+        if(Test-Connection $_ -Count 1 -Quiet){
+            if((Test-Path $MatlabUninstaller) -and (Test-Path $MatlabBinary)){
             Invoke-Command -ComputerName $_ -ScriptBlock {
                 Start-Process "C:\Program Files\MATLAB\R2024b\bin\win64\MathWorksProductUninstaller.exe" -ArgumentList "--mode silent" -Wait
             }
+            }
+            if(Test-Path $MatlabBinary){
+                Write-Output "$_ Failed"
+            }
+            if(-not (Test-Path $MatlabBinary)){
+                Write-Output $_
+            }
+        }else{
+            Write-Output "$_ Offline"
         }
-        if(Test-Path $MatlabBinary){
-            Write-Output "$_ Failed"
-        }
-        if(-not (Test-Path $MatlabBinary)){
-            Write-Output $_
-        }
+        
     } | Sort-Object
 
     Write-Host "Install New Matlab?"
@@ -43,7 +49,7 @@ function Uninstall-MatlabR2024bFromLab {
         Default {throw "Huh?"}
     }
 
-    $comps.name | ForEach-Object -ThrottleLimit 5 -Parallel {
+    $comps.name | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
         Invoke-MECMAppInstall -Computer $_ -AppName "Matlab" -Method Install
     } | Sort-Object -Property PSComputerName
 
