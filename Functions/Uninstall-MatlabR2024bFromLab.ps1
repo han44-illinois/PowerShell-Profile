@@ -53,6 +53,7 @@ function Uninstall-MatlabR2024bFromLab {
     $comps.name | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
         Write-Host "Installing on $_"
         Invoke-MECMAppInstall -Computer $_ -AppName "Matlab" -Method Install
+        Write-Host "Install invoked on $_"
     } | Sort-Object -Property PSComputerName
 
 }
