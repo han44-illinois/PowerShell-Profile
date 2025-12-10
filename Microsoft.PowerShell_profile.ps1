@@ -8,3 +8,5 @@ function out-default {
   $input | Tee-Object -var global:lastobject | 
   Microsoft.PowerShell.Core\out-default
 }
+
+Set-PSReadLineOption -PredictionViewStyle ListView
