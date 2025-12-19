@@ -8,11 +8,13 @@ function Invoke-CMCollectionUpdateForInstantImaging {
             Push-Location
             Prep-MECM
         }
+        $TSCollection = "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, with SC)"
+        $TSNoMaintCollection = "UIUC-ENGR-IS Deploy OSD Available TS + No Maintenance Window"
     }
 
     PROCESS {
-        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Deploy OSD Available TS + No Maintenance Window"
-        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, with SC)"
+        Invoke-CMDeviceCollectionUpdate -Name $TSNoMaintCollection
+        Invoke-CMDeviceCollectionUpdate -Name $TSCollection
         Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Exclude from ALL windows"
         Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Exclude from Standard window"
         Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Machines not in ANY maint window collection"
@@ -21,9 +23,9 @@ function Invoke-CMCollectionUpdateForInstantImaging {
         Write-Host "$(Get-Date -DisplayHint Time) Waiting 15 minutes to push policy..."
 
         Start-Sleep -Seconds 900
-        Invoke-CMClientAction -CollectionName "UIUC-ENGR-IS Deploy OSD Available TS + No Maintenance Window" -ActionType ClientNotificationRequestMachinePolicyNow
+        Invoke-CMClientAction -CollectionName $TSNoMaintCollection -ActionType ClientNotificationRequestMachinePolicyNow
 
-        $DeploymentID = (Get-CMDeployment -CollectionName "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, with SC)").DeploymentID
+        $DeploymentID = (Get-CMDeployment -CollectionName $TSCollection).DeploymentID
         Write-Host "Reminder: When you're ready, invoke task sequence with deployment id $DeploymentID"
     }
 
