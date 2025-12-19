@@ -12,7 +12,7 @@ function Invoke-CMCollectionUpdateForInstantImaging {
 
     PROCESS {
         Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS OSD Available TS + No Maintenance Window"
-        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, with SC)"
+        Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, with SC)"
         Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Exclude from ALL windows"
         Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Exclude from Standard window"
         Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-IS Maint Window - Machines not in ANY maint window collection (Alternate)"
