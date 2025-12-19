@@ -23,7 +23,7 @@ function Invoke-CMCollectionUpdateForInstantImaging {
         Start-Sleep -Seconds 900
         Invoke-CMClientAction -CollectionName "UIUC-ENGR-IS Deploy OSD Available TS + No Maintenance Window" -ActionType ClientNotificationRequestMachinePolicyNow
 
-        $DeploymentID = (Get-CMDeployment -CollectionName "UIUC-ENGR-IS OSD TS (Win11 2023c, Available, with SC)").DeploymentID
+        $DeploymentID = (Get-CMDeployment -CollectionName "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, with SC)").DeploymentID
         Write-Host "Reminder: When you're ready, invoke task sequence with deployment id $DeploymentID"
     }
 
