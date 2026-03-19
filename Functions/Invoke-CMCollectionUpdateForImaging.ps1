@@ -17,7 +17,8 @@ function Invoke-CMCollectionUpdateForImaging {
             Push-Location
             Prep-MECM
         }
-        $ImagingCollection = "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, no SC)"
+        # "UIUC-ENGR-IS Deploy OSD TS (Win11 2025a, Available, no SC)"
+        $ImagingCollection = "MP00344A"
     }
 
     PROCESS{
@@ -37,13 +38,17 @@ function Invoke-CMCollectionUpdateForImaging {
             
         }
 
-        $CollectionCheck = Get-CMCollectionMember -CollectionName $ImagingCollection -Name $ComputerName
+        $CollectionCheck = Get-CMCollectionMember -CollectionId $ImagingCollection -Name $ComputerName
 
         if(-not $CollectionCheck){
-            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Devices without MECM client"
-            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional"
-            Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional plus devices without MECM client"
-            Invoke-CMDeviceCollectionUpdate -Name $ImagingCollection
+            # Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Devices without MECM client"
+            Invoke-CMDeviceCollectionUpdate -CollectionId MP001B10
+            # Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional"
+            Invoke-CMDeviceCollectionUpdate -CollectionId MP0003A8
+            # Invoke-CMDeviceCollectionUpdate -Name "UIUC-ENGR-Instructional plus devices without MECM client"
+            Invoke-CMDeviceCollectionUpdate -CollectionId MP001B56
+            # Invoke-CMDeviceCollectionUpdate -Name $ImagingCollection
+            Invoke-CMDeviceCollectionUpdate -CollectionId $ImagingCollection
             
             $ComputerExistsInCollection = $false
             $CheckCount = 0
