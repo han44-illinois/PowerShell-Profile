@@ -28,10 +28,10 @@ param(
         }
         'History' {
             $Output = Get-ChildItem -Path "\\engr-is-auto01\share\automations\data\get-offline-systems-output\offline-systems_$Year-$Month*.csv" | 
-                ForEach-Object { Get-Content -Path $_ | ConvertFrom-Csv -Header "name","os" }
+                ForEach-Object { Get-Content -Path $_ | ConvertFrom-Csv -Header "Name","OS" }
             
             if($OS){
-                $Output = $Output | Where-Object {$_.os -eq $OS}
+                $Output = $Output | Where-Object {$_.OS -eq $OS}
             }
 
             $Output = $Output | Select-Object -ExpandProperty name | 
