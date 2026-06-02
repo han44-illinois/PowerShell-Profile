@@ -73,7 +73,9 @@ function Build-RefreshImportCSVs{
                     }
 
                     if($OS -eq "RHEL"){
+                        $SatelliteDelete = "hammer host delete --name $ComputerName"
                         $SatelliteResult = "hammer host create --name $ComputerName --interface mac=$MACAddress --hostgroup=rhel-9-serv-x86_64 --pxe-loader 'Grub2 UEFI' --parameters part_device=/dev/nvme0n1 --organization='GCoE' --location='Instructional' --subnet=default"
+                        $SatelliteTXT.Add($SatelliteDelete) | Out-Null
                         $SatelliteTXT.Add($SatelliteResult) | Out-Null
                     }
 
