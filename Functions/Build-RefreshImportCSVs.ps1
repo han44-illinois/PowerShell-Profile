@@ -10,13 +10,14 @@ function Build-RefreshImportCSVs{
     )
 
         # Columns from the CSV because this seems to change every year.
-        $ColumnLab = "Actual Lab"
-        $ColumnName = "Actual Hostname"
+        $ColumnLab = "Lab"
+        $ColumnName = "Intended Hostname"
         $ColumnMac = 'LOM MAC (10GB NIC)'
-        $ColumnOS = 'Actual OS/Image'
+        $ColumnBackupMac = 'LOM MAC (1GB NIC)'
+        $ColumnOS = 'Intended OS/Image'
 
         # Spare Lab. This value should be whatever marks our spares, since we don't care to create import sheets for those.
-        $SpareLab = "*EWS-FY25*"
+        $SpareLab = "*EWS-FY26*"
     
         if([IO.Path]::GetExtension($InputFile) -ne ".csv"){
             throw "This function requires a .csv input!"
@@ -52,9 +53,13 @@ function Build-RefreshImportCSVs{
             $SatelliteTXT.Add('#!/bin/bash') | Out-Null
     
             $Refresh | ForEach-Object {
-                if($_.$ColumnLab -eq $CurrentLab){
+                if(($_.$ColumnLab -eq $CurrentLab) -and ($_.$ColumnLab -ne '')){
                     $ComputerName = $_.$ColumnName
-                    $MACAddress = $_.$ColumnMac -split '(..)' -ne '' -join ":"
+                    if(($_.$ColumnMac -eq '') -or ($_.$ColumnMac -eq 'N/A')){
+                        $MACAddress = $_.$ColumnBackupMac -split '(..)' -ne '' -join ":"
+                    } else {
+                        $MACAddress = $_.$ColumnMac -split '(..)' -ne '' -join ":"
+                    }
                     $OS = $_.$ColumnOS
 
                     $Hostname = ($ComputerName + ".ews.illinois.edu") -replace ".ews.illinois.edu.ews.illinois.edu",".ews.illinois.edu"
@@ -111,11 +116,13 @@ function Build-RefreshImportCSVs{
                         }
                     }
                     $IPAMcsv.Add($IPAMResult) | Out-Null
+                    Write-Verbose "Adding $IPAMResult"
                 }
             }
-            if($MECMcsv)            {$MECMcsv | ConvertTo-Csv -NoHeader  | Out-File "$OutputPath\MECM\$CurrentLab-MECM.csv"}
-            if($SatelliteTXT)       {$SatelliteTXT | Out-File "$OutputPath\Satellite\$CurrentLab-Satellite.txt"}
-            if($IPAMcsv)            {$IPAMcsv | ConvertTo-Csv            | Out-File "$OutputPath\IPAM\$CurrentLab-IPAM.csv"}
+            if($MECMcsv)                            {$MECMcsv | ConvertTo-Csv -NoHeader  | Out-File "$OutputPath\MECM\$CurrentLab-MECM.csv"}
+            if($SatelliteTXT -ne '#!/bin/bash')     {$SatelliteTXT | Out-File "$OutputPath\Satellite\$CurrentLab-Satellite.txt"}
+            if($IPAMcsv)                            {$IPAMcsv | ConvertTo-Csv            | Out-File "$OutputPath\IPAM\$CurrentLab-IPAM.csv"}
+            Write-Verbose "IPAMcsv: $IPAMcsv"
             Write-Host "Processed $CurrentLab"
         }
     
