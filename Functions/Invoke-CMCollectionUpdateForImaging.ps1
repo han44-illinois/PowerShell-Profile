@@ -54,7 +54,7 @@ function Invoke-CMCollectionUpdateForImaging {
             $CheckCount = 0
 
             while((-not $ComputerExistsInCollection) -and ($CheckCount -le $CheckLimitCount)){
-                $CollectionCheck = Get-CMCollectionMember -CollectionName $ImagingCollection -Name $ComputerName
+                $CollectionCheck = Get-CMCollectionMember -CollectionId $ImagingCollection -Name $ComputerName
                 if($CollectionCheck){
                     $ComputerExistsInCollection = $true
                     Write-Host "Device in collection at $(Get-Date -DisplayHint Time)"
