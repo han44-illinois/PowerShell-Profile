@@ -10,3 +10,6 @@ function out-default {
 }
 
 Set-PSReadLineOption -PredictionViewStyle ListView
+
+$PSDefaultParameterValues.Add('Get-MachineInfo:OUDN',"OU=Instructional,OU=Desktops,OU=Engineering,OU=Urbana,DC=ad,DC=uillinois,DC=edu")
+$PSDefaultParameterValues.Add('Get-MachineInfo:PassThru',$true)
