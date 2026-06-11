@@ -37,7 +37,7 @@ function Get-BIOSFromLab{
 
     param(
         [Parameter()]
-        [string] $comps
+        [string] $Comps
     )
     
 
@@ -49,7 +49,7 @@ function Get-BIOSFromLab{
                 if(Test-Connection $_.Name -IPv4 -Quiet -Count 1){ 
                     Get-CimInstance -ClassName Win32_BIOS -ComputerName $_.Name | Select-Object PSComputerName,SMBIOSBIOSVersion 
                 }else{
-                    Write-Host "$($_.Name) did not respond" 
+                    Write-Host "$($_.Name) did not respond" -ForegroundColor Red
                 }
             } | 
                 Sort-Object -Property PSComputerName
