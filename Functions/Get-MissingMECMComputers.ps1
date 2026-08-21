@@ -29,9 +29,16 @@ function Get-MissingMECMComputers{
     }
 
     PROCESS{
-        $MECMComps = Get-CMCollectionMember -CollectionName $MECMCollection | Select-Object -ExpandProperty Name | Sort-Object
-        $ADComps = Get-ADComputer -Filter * -SearchBase $ADSearchBase | Where-Object {$_.DistinguishedName -notmatch $ADExclusionRegex} | Select-Object -ExpandProperty Name | Sort-Object
-        $Result = Compare-Object -ReferenceObject $ADComps -DifferenceObject $MECMComps | Where-Object {$_.SideIndicator -eq '<='} | Select-Object -ExpandProperty InputObject
+        $MECMComps = Get-CMCollectionMember -CollectionName $MECMCollection | 
+            Select-Object -ExpandProperty Name | 
+            Sort-Object
+        $ADComps = Get-ADComputer -Filter * -SearchBase $ADSearchBase | 
+            Where-Object {$_.DistinguishedName -notmatch $ADExclusionRegex} | 
+            Select-Object -ExpandProperty Name | 
+            Sort-Object
+        $Result = Compare-Object -ReferenceObject $ADComps -DifferenceObject $MECMComps | 
+            Where-Object {$_.SideIndicator -eq '<='} | 
+            Select-Object -ExpandProperty InputObject
     }
 
     END{
