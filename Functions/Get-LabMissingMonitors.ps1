@@ -34,6 +34,10 @@ function Get-LabMissingMonitors{
     )
 
     BEGIN{
+        Write-Verbose "Running with parameters:"
+        Write-Verbose "'Lab' = $Lab"
+        Write-Verbose "'MonitorCount' = $MonitorCount"
+        Write-Verbose "'SearchBase' = $SearchBase"
         $Computers = Get-ADComputer -Filter "name -like `"$Lab*`"" -SearchBase $SearchBase
         [int]$ProgressCounter = 0
     }
@@ -47,7 +51,7 @@ function Get-LabMissingMonitors{
             }
             Write-Progress @ProgressParameters
             if(Test-Connection -TargetName $comp.name -Count 1 -Quiet){
-                if(((Get-WMIMonitorInfo -ComputerName $comp.name -ErrorAction SilentlyContinue).count) -ne 2){
+                if(((Get-WMIMonitorInfo -ComputerName $comp.name -ErrorAction SilentlyContinue).count) -ne $MonitorCount){
                     $comp.name
                 }
             }
