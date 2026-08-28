@@ -19,7 +19,10 @@ function Get-LabMissingMonitors{
     .EXAMPLE
         PS>
 
-        Example of how to use this cmdlet
+        Get-LabMissingMonitors -Lab eh-406b1 -MonitorCount 2
+
+    .NOTES
+        Requires modules ActiveDirectory and Get-WMIMonitorInfo
     #>
 
     [CmdletBinding()]
