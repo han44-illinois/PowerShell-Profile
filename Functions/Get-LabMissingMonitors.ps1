@@ -44,6 +44,7 @@ function Get-LabMissingMonitors{
 
     PROCESS{
         foreach($comp in $Computers){
+            Write-Verbose "Checking $($comp.name)"
             $ProgressParameters = @{
                 Activity            = 'Checking Computers'
                 Status              = $comp.name
@@ -51,9 +52,14 @@ function Get-LabMissingMonitors{
             }
             Write-Progress @ProgressParameters
             if(Test-Connection -TargetName $comp.name -Count 1 -Quiet){
-                if(((Get-WMIMonitorInfo -ComputerName $comp.name -ErrorAction SilentlyContinue).count) -ne $MonitorCount){
+                $Monitors = Get-WMIMonitorInfo -ComputerName $comp.name -ErrorAction SilentlyContinue
+                Write-Verbose $Monitors
+                if(($Monitors.count) -ne $MonitorCount){
+                    Write-Verbose "$($comp.name) only had $($Monitors.count) monitors."
                     $comp.name
                 }
+            }else{
+                Write-Verbose "$($comp.name) did not respond!"
             }
             $ProgressCounter++
         }
