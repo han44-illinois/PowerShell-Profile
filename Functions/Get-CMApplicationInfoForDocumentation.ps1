@@ -52,7 +52,7 @@ function Get-CMApplicationInfoForDocumentation{
             $InstallDirectory = $InstallDirectory.TrimStart('\')
         }
         $InstallCommand = $InstallerXML.Args.Arg[0].'#text'
-        $Install = '`' + $InstallDirectory + $InstallCommand + '`'
+        $Install = '```' + $InstallDirectory + $InstallCommand + '```'
         $Install = $Install -replace '\\','\'
 
         $UninstallerXML = [xml]$SDMPackageXML.AppMgmtDigest.DeploymentType.Installer.UninstallAction.Args.OuterXml
@@ -61,7 +61,7 @@ function Get-CMApplicationInfoForDocumentation{
             $UninstallDirectory = $UninstallDirectory.TrimStart('\')
         }
         $UninstallCommand = $UninstallerXML.Args.Arg[0].'#text'
-        $Uninstall = '`' + $UninstallDirectory + $UninstallCommand + '`'
+        $Uninstall = '```' + $UninstallDirectory + $UninstallCommand + '```'
         $Uninstall = $Uninstall -replace '\\','\'
 
         $DetectionXML = [xml]$SDMPackageXML.AppMgmtDigest.DeploymentType.Installer.DetectAction.Args.Arg[1].'#text'
@@ -116,7 +116,7 @@ function Get-CMApplicationInfoForDocumentation{
                     }
                 }
                 
-                $DetectionMethod = ('`File: ' + $Path + $FileOrFolderName + " " + $OperatorChar + " " + $DetectionVersion + '`') -replace "  "," "
+                $DetectionMethod = ('```File: ' + $Path + $FileOrFolderName + " " + $OperatorChar + " " + $DetectionVersion + '```') -replace "  "," "
                 $DetectionMethod = $DetectionMethod -replace '\\','\'
             }
         }
