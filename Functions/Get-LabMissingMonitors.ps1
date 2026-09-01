@@ -56,9 +56,11 @@ function Get-LabMissingMonitors{
                 foreach($mon in $Monitors){
                     Write-Verbose $mon
                 }
-                if(($Monitors.count) -ne $MonitorCount){
+                if(($Monitors.count) -lt $MonitorCount){
                     Write-Verbose "$($comp.name) only had $($Monitors.count) monitors."
                     $comp.name
+                } elseif(($Monitors.count) -gt $MonitorCount){
+                    Write-Verbose "$($comp.name) had $($Monitors.count) monitors, more than the expected number!"
                 }
             }else{
                 Write-Verbose "$($comp.name) did not respond!"
