@@ -16,6 +16,9 @@ function Get-LabMissingMonitors{
     .PARAMETER SearchBase
         OU searchbase for Get-ADComputer. Default Instructional OU
 
+    .PARAMETER IncludeInstructors
+        Set this switch to include instructor systems. Default will exclude instructor stations.
+
     .EXAMPLE
         PS>
 
@@ -30,7 +33,8 @@ function Get-LabMissingMonitors{
     param(
         [string] $Lab,
         [int] $MonitorCount = 2,
-        [string] $SearchBase = "OU=Instructional,OU=Desktops,OU=Engineering,OU=Urbana,DC=ad,DC=uillinois,DC=edu"
+        [string] $SearchBase = "OU=Instructional,OU=Desktops,OU=Engineering,OU=Urbana,DC=ad,DC=uillinois,DC=edu",
+        [switch] $IncludeInstructors
     )
 
     BEGIN{
@@ -38,11 +42,16 @@ function Get-LabMissingMonitors{
         Write-Verbose "'Lab' = $Lab"
         Write-Verbose "'MonitorCount' = $MonitorCount"
         Write-Verbose "'SearchBase' = $SearchBase"
+        Write-Verbose "'IncludeInstructors = $IncludeInstructors"
         $Computers = Get-ADComputer -Filter "name -like `"$Lab*`"" -SearchBase $SearchBase
         [int]$ProgressCounter = 0
     }
 
     PROCESS{
+        if(-not ($IncludeInstructors)){
+            Write-Verbose "Excluding instructor stations"
+            $Computers = $Computers | Where-Object {$_.DistinguishedName -notlike "*Instructor PC*"}
+        }
         foreach($comp in $Computers){
             Write-Verbose "Checking $($comp.name)"
             $ProgressParameters = @{
