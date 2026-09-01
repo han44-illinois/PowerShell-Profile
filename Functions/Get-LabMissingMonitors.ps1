@@ -53,7 +53,9 @@ function Get-LabMissingMonitors{
             Write-Progress @ProgressParameters
             if(Test-Connection -TargetName $comp.name -Count 1 -Quiet){
                 $Monitors = Get-WMIMonitorInfo -ComputerName $comp.name -ErrorAction SilentlyContinue
-                Write-Verbose $Monitors
+                foreach($mon in $Monitors){
+                    Write-Verbose $mon
+                }
                 if(($Monitors.count) -ne $MonitorCount){
                     Write-Verbose "$($comp.name) only had $($Monitors.count) monitors."
                     $comp.name
